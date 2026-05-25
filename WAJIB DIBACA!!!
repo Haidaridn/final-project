@@ -1,0 +1,46 @@
+Ketentuan Untuk Final Project Kita:
+
+1. paduan warna untuk website yaitu:
+
+- Primary: #7C3AED
+- Secondary: #A78BFA
+- Background: #F5F3FF
+- Card: #FFFFFF
+- Text: #1F2937
+- Border: #E5E7EB
+
+
+2. halaman user terdiri dari:
+
+- Dashborad - tampilkan grafik dari semua data seperti notes, category, archive, trash
+- All notes - untuk membuat note baru, menampilkan semua notes, dan ada fitur seperti: pinned, archive, trash dan fileter. 
+- Categories - untuk menambahkan data category
+- Archive - catatan yang di archive
+- Trash - catatan yang di delete
+
+- Profile Settings
+ --profile
+ --logout
+
+
+3. contoh untuk propmting ke AI:
+
+Sekarang Role kamu adalah sebagai pengembangan web yang mahir di php, laravel, livewire, dan tailwind css. Tolong buatkan saya sebuah code untuk tampilan...(tuliskan sesuai tampilan halaman yang inign di buat) di dalam file "Livewire/User/test.blade.php(berikan keterangan file sesuai letak dan nama file)", dengan paduan warna: 
+
+- Primary: #7C3AED
+- Secondary: #A78BFA
+- Background: #F5F3FF
+- Card: #FFFFFF
+- Text: #1F2937
+- Border: #E5E7EB
+
+
+4. Langkah2 kalau Mau push Ke Repository Github:
+
+- git add .
+- git checkout -b "nama branch"
+- git commit -m "nama bebas"
+- git push origin "nama branch"
+
+
+NOTE!! Untuk serang kita pake chatGpt aja dlu kenapa? karena design nya simple gak kayak claude langsung full di buatin + code nya panjang bangettt....
