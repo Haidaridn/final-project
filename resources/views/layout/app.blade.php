@@ -34,7 +34,7 @@
 
         <nav class="mt-6 px-4 space-y-2">
 
-            <a href="/dasbor" class="block py-3 px-4 rounded-xl bg-[#7C3AED] text-white">
+            <a href="/dashboard" class="block py-3 px-4 rounded-xl bg-[#7C3AED] text-white">
                 Dashboard
             </a>
 
@@ -42,7 +42,7 @@
                 All Notes
             </a>
 
-            <a href="#" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
+            <a href="/category" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
                 Category
             </a>
 
