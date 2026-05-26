@@ -46,11 +46,11 @@
                 Category
             </a>
 
-            <a href="#" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
+            <a href="/archived" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
                 Archived
             </a>
 
-            <a href="#" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
+            <a href="/trash" class="block py-3 px-4 rounded-xl hover:bg-[#EDE9FE] text-gray-700">
                 Trash
             </a>
 
@@ -90,9 +90,9 @@
 
                 <!-- Dropdown -->
                 <div id="profileMenu"
-                    class="hidden absolute right-0 mt-3 w-44 bg-white border border-[#E5E7EB] rounded-xl shadow">
+                    class="hidden absolute right-0 mt-3 w-44 bg-white border border-[#E5E7EB] rounded-xl shadow z-50">
 
-                    <a href="#"
+                    <a href="/edit-profile"
                         class="block px-4 py-3 hover:bg-[#F5F3FF] text-gray-700 rounded-t-xl">
                         Edit Profile
                     </a>

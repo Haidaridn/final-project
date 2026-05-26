@@ -27,7 +27,19 @@ Route::middleware('auth')->group(function () {
         return view('catatan');
     });
 
-        Route::get('/category', function () {
+    Route::get('/category', function () {
         return view('kategori');
+    });
+
+    Route::get('/archived', function () {
+        return view('arsip');
+    });
+
+    Route::get('/trash', function () {
+        return view('sampah');
+    });
+
+    Route::get('/edit-profile', function () {
+        return view('edit');
     });
 });
