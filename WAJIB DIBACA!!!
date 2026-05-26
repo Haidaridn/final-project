@@ -38,9 +38,11 @@ Sekarang Role kamu adalah sebagai pengembangan web yang mahir di php, laravel, l
 4. Langkah2 kalau Mau push Ke Repository Github:
 
 - git add .
-- git checkout -b "nama branch"
+- git checkout -b nama branch (lakukan ini kalau mau pindah + tambah branch baru)
+- git checkout (pindah branch yang udah ada)
 - git commit -m "nama bebas"
-- git push origin "nama branch"
+- git push origin nama branch
+- git branch (kalau mau lihat branch mana yang kalian lagi tempatin)
 
 
 NOTE!! Untuk serang kita pake chatGpt aja dlu kenapa? karena design nya simple gak kayak claude langsung full di buatin + code nya panjang bangettt....
