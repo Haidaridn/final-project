@@ -27,12 +27,12 @@ Ketentuan Untuk Final Project Kita:
 
 Sekarang Role kamu adalah sebagai pengembangan web yang mahir di php, laravel, livewire, dan tailwind css. Tolong buatkan saya sebuah code untuk tampilan...(tuliskan sesuai tampilan halaman yang inign di buat) di dalam file "Livewire/User/test.blade.php(berikan keterangan file sesuai letak dan nama file)", dengan paduan warna: 
 
-- Primary: #7C3AED
-- Secondary: #A78BFA
-- Background: #F5F3FF
-- Card: #FFFFFF
-- Text: #1F2937
-- Border: #E5E7EB
+                                                                                                                  - Primary: #7C3AED
+                                                                                                                  - Secondary: #A78BFA
+                                                                                                                  - Background: #F5F3FF
+                                                                                                                  - Card: #FFFFFF
+                                                                                                                  - Text: #1F2937
+                                                                                                                  - Border: #E5E7EB
 
 
 4. Langkah2 kalau Mau push Ke Repository Github:

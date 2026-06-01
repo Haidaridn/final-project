@@ -23,6 +23,10 @@ Route::middleware('auth')->group(function () {
         return view('dasbor');
     });
 
+    Route::get('/favorites', function () {
+        return view('favorit');
+    });
+
     Route::get('/notes', function () {
         return view('catatan');
     });
