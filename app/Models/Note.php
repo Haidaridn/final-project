@@ -17,6 +17,7 @@ class Note extends Model
         'user_id',
         'is_pinned',
         'is_archived',
+        'is_favorite',
     ];
 
     public function category()

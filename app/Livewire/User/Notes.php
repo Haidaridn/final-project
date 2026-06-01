@@ -102,6 +102,17 @@ class Notes extends Component
                 ]);
             }
 
+            // TOGGLE FAVORITE
+            public function toggleFavorite($id)
+            {
+                $note = Note::where('user_id', Auth::id())
+                    ->findOrFail($id);
+
+                $note->update([
+                    'is_favorite' => !$note->is_favorite,
+                ]);
+            }
+
             // FILTER PINNED
             public function filterPinned()
             {

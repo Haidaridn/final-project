@@ -354,30 +354,73 @@
                 {{-- TOP --}}
                 <div class="flex items-start justify-between gap-3">
 
-                    <div class="min-w-0">
+                    <div class="min-w-0 flex-1">
+
                         <div class="flex items-center gap-2 mb-1">
-                            <div class="w-2 h-2 rounded-full flex-shrink-0"
-                                 style="background: {{ $note->category->color ?? '#6366f1' }}; box-shadow: 0 0 0 3px {{ $note->category->color ?? '#6366f1' }}22;"></div>
+
+                            <div
+                                class="w-2 h-2 rounded-full flex-shrink-0"
+                                style="background: {{ $note->category->color ?? '#6366f1' }};
+                                box-shadow: 0 0 0 3px {{ $note->category->color ?? '#6366f1' }}22;">
+                            </div>
+
                             <h2 class="an-font-display font-600 text-base text-slate-900 leading-snug truncate">
                                 {{ $note->title }}
                             </h2>
+
                         </div>
+
                         <p class="text-xs text-slate-400 flex items-center gap-1 ml-4">
-                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+                            <svg
+                                class="w-3 h-3"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
+
                             {{ $note->created_at->diffForHumans() }}
+
                         </p>
+
                     </div>
 
-                    {{-- PIN --}}
-                    <button
-                        wire:click="togglePin({{ $note->id }})"
-                        class="an-pin-btn flex-shrink-0">
+                    {{-- RIGHT ACTION --}}
+                    <div class="flex items-center gap-2 flex-shrink-0">
 
-                        {{ $note->is_pinned ? '📌' : '📍' }}
+                        {{-- FAVORITE --}}
+                        <button
+                            wire:click="toggleFavorite({{ $note->id }})"
+                            class="an-pin-btn">
 
-                    </button>
+                            @if($note->is_favorite)
+
+                                ⭐
+
+                            @else
+
+                                ☆
+
+                            @endif
+
+                        </button>
+
+                        {{-- PIN --}}
+                        <button
+                            wire:click="togglePin({{ $note->id }})"
+                            class="an-pin-btn">
+
+                            {{ $note->is_pinned ? '📌' : '📍' }}
+
+                        </button>
+
+                    </div>
 
                 </div>
 
