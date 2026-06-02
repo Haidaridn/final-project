@@ -11,6 +11,7 @@ class Category extends Model
         'genre',
         'color',
         'user_id',
+        'slug'
     ];
 
     public function user()
@@ -21,5 +22,10 @@ class Category extends Model
     public function notes()
     {
         return $this->hasMany(Note::class);
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

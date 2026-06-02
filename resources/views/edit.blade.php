@@ -1,4 +1,4 @@
-@extends('layout.nav-profile')
+@extends('layouts.nav-profile')
 
 @section('content')
     @livewire('user.editprofile') 

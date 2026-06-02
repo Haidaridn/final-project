@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Models\Category;
+use App\Livewire\User\Notes;
 
 Route::get('/', function () {
     return view('welcome');

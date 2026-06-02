@@ -2,6 +2,7 @@
 
 namespace App\Livewire\User;
 
+use Illuminate\Support\Str; 
 use Livewire\Component;
 use App\Models\Category as ModelsCategory;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,7 @@ class Category extends Component
     {
         $this->resetForm();
 
+        $this->color = '#6366f1'; // default selalu
         $this->showModal = true;
     }
 
@@ -49,18 +51,34 @@ class Category extends Component
                 'color' => $this->color,
             ]);
 
-        } else {
+        } else {   
 
-            ModelsCategory::create([
-                'genre' => $this->genre,
-                'color' => $this->color,
-                'user_id' => Auth::id(),
-            ]);
+        $slug = Str::slug($this->genre);
+
+        $counter = 1;
+
+        while (ModelsCategory::where('slug', $slug)->exists()) {
+            $slug = Str::slug($this->genre) . '-' . $counter++;
+        }
+
+        ModelsCategory::create([
+            'genre' => $this->genre,
+            'color' => $this->color,
+            'user_id' => Auth::id(),
+            'slug' => $slug,
+        ]);
         }
 
         $this->closeModal();
 
-        $this->resetForm();
+        $this->reset([
+            'genre',
+            'color',
+            'editingId',
+        ]);
+
+        $this->color = '#6366f1';
+        $this->resetValidation();
     }
 
     // EDIT
@@ -87,10 +105,11 @@ class Category extends Component
     // RESET FORM
     public function resetForm()
     {
-        $this->reset([
-            'genre',
-            'editingId',
-        ]);
+    $this->reset([
+        'genre',
+        'color',
+        'editingId',
+    ]);
 
         $this->color = '#6366f1';
 

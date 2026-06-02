@@ -52,6 +52,29 @@
 
         </div>
 
+        @if ($errors->any())
+            <div
+                x-data="{ show: true }"
+                x-show="show"
+                class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center justify-between">
+
+                <div class="flex items-center gap-2">
+                    <span>⚠️</span>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+
+                <button
+                    type="button"
+                    @click="show = false"
+                    class="text-red-500 hover:text-red-700">
+
+                    ✕
+
+                </button>
+
+            </div>
+        @endif
+
         <!-- Form -->
         <form method="POST" action="/login" class="space-y-4">
             @csrf
