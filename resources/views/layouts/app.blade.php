@@ -47,19 +47,10 @@
         .nav-link { transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease; }
     </style>
 
-    <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        }
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.add('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.add('hidden');
-        }
-    </script>
-
     @livewireStyles
+
 </head>
+
 @php
     function activeMenu($route) {
         return request()->is($route)
@@ -159,6 +150,7 @@
                 </svg>
                 Favorites
             </a>
+            
 
             {{-- Category --}}
             <a href="/category"
@@ -207,10 +199,16 @@
                 </svg>
                 Trash
             </a>
+            
 
+            <livewire:user.sidebar-notebooks />
         </nav>
 
     </aside>
+
+    {{-- NOTEBOOKS --}}     
+   
+    
     <!-- ══ END SIDEBAR ══ -->
 
 
@@ -218,6 +216,7 @@
          MAIN CONTENT
     ══════════════════════════════════════════ -->
     <div class="flex-1 flex flex-col md:ml-[220px] min-w-0">
+           
 
         <!-- Navbar -->
         <header class="bg-white/90 backdrop-blur-sm sticky top-0 z-30
@@ -331,10 +330,11 @@
         <main class="p-6 overflow-y-auto flex-1">
             @yield('content')
         </main>
-
+        
     </div>
-
+    
 </div>
+<livewire:user.notebook-modal /> 
 
 @livewireScripts
 </body>

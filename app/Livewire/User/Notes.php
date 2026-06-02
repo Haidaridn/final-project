@@ -6,6 +6,7 @@ use App\Models\Note;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use App\Models\Category;
+use Livewire\Attributes\On;
 
 class Notes extends Component
         {
@@ -20,7 +21,8 @@ class Notes extends Component
             public $editingId = null;
 
             public $showPinnedOnly = false;
-
+            public $selectedCategory = null;
+            
             protected $rules = [
                 'title' => 'required|min:3',
                 'content' => 'required|min:3',
@@ -123,6 +125,8 @@ class Notes extends Component
             public function resetFilter()
             {
                 $this->showPinnedOnly = false;
+                $this->selectedCategory = null;
+                $this->search = '';
             }
 
             // RESET FORM
@@ -135,33 +139,46 @@ class Notes extends Component
                     'editingId',
                 ]);
             }
-
+            
             public function render()
             {
                 $notes = Note::where('user_id', Auth::id())
-                    ->where('is_archived', false) // 👈 INI PENTING (biar hilang dari All Notes)
-                    
+                    ->where('is_archived', false)
+
+
                     ->when($this->search, function ($query) {
                         $query->where(function ($q) {
                             $q->where('title', 'like', '%' . $this->search . '%')
-                            ->orWhere('content', 'like', '%' . $this->search . '%');
+                            ->orWhere('content', 'like', '%' .      $this->search . '%');
                         });
                     })
+
 
                     ->when($this->showPinnedOnly, function ($query) {
                         $query->where('is_pinned', true);
                     })
 
+
+                    ->when($this->selectedCategory, function ($query) {
+                        $query->where('category_id', $this->selectedCategory);
+                    })
+
+
                     ->latest()
                     ->get();
 
+
                 $categories = Category::where('user_id', Auth::id())->get();
+
+
+
 
                 return view('livewire.user.notes', [
                     'notes' => $notes,
                     'categories' => $categories,
                 ]);
             }
+
 
                 public function archive($id)
                 {
@@ -172,4 +189,10 @@ class Notes extends Component
                         'is_archived' => true,
                     ]);
                 }
+
+            #[On('filter-category')]
+            public function filterCategory($categoryId)
+            {
+                $this->selectedCategory = $categoryId;
+            }
         }
