@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>NoteSpace</title>
 
-    <!-- Google Fonts: Outfit (body) + Fraunces (brand accent) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
                     },
                 }
             }
         }
     </script>
+
     <script>
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('-translate-x-full');
@@ -40,30 +40,102 @@
     </script>
 
     <style>
-        /* Single transition rule Tailwind can't express in one utility */
-        #sidebar { transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
-        /* Nav item hover nudge */
-        .nav-link:hover:not(.nav-active) { transform: translateX(3px); }
-        .nav-link { transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease; }
+        :root {
+            --bg: #FFFFFF;
+            --soft: #FAF7F2;
+            --text: #2B2B2B;
+            --muted: #6B6B6B;
+            --border: #EAE4DB;
+            --accent: #C87A45;
+            --accent-hover: #B56835;
+            --hover: #F5EEE5;
+        }
+
+        * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
+
+        body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); }
+
+        /* Sidebar slide */
+        #sidebar { transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Nav items */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 11px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            transition: background 0.18s ease, color 0.18s ease;
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+        .nav-item.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+        .nav-item.active svg { opacity: 1; }
+        .nav-item svg { opacity: 0.6; flex-shrink: 0; transition: opacity 0.18s; }
+        .nav-item:hover svg, .nav-item.active svg { opacity: 1; }
+
+        /* Section labels */
+        .sidebar-label {
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+            color: #B8AFA4;
+            padding: 0 14px;
+            margin-bottom: 4px;
+            margin-top: 4px;
+        }
+
+        /* Scrollbar hide */
+        .sidebar-scroll { scrollbar-width: none; }
+        .sidebar-scroll::-webkit-scrollbar { display: none; }
+
+        /* Profile dropdown */
+        #profileMenu { transition: opacity 0.15s ease; }
+
+        /* Dropdown items */
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .dropdown-item:hover { background: var(--hover); }
+        .dropdown-item.danger { color: #DC2626; }
+        .dropdown-item.danger:hover { background: #FEF2F2; }
     </style>
 
     @livewireStyles
-
 </head>
 
 @php
     function activeMenu($route) {
-        return request()->is($route)
-            ? 'text-white bg-gradient-to-br from-violet-500 to-violet-700 shadow-[0_6px_18px_rgba(124,58,237,0.28),0_2px_6px_rgba(109,40,217,0.20)]'
-            : 'text-[#7A7A8C] hover:bg-black/[0.045] hover:text-[#3D3D52]';
+        return request()->is($route) ? 'active' : '';
     }
 @endphp
-<body class="bg-[#EEEEF3] font-sans">
+
+<body>
 
 <!-- Mobile overlay -->
 <div id="sidebar-overlay"
      onclick="closeSidebar()"
-     class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-40 md:hidden">
+     class="hidden fixed inset-0 bg-black/20 backdrop-blur-[2px] z-40 md:hidden">
 </div>
 
 <div class="flex h-screen overflow-hidden">
@@ -73,268 +145,203 @@
     ══════════════════════════════════════════ -->
     <aside id="sidebar"
            class="fixed inset-y-0 left-0 z-50
-                  w-[220px] -translate-x-full
+                  w-[260px] -translate-x-full
                   md:translate-x-0
-                  bg-[#F5F5F8]
-                  flex flex-col
-                  shadow-[1px_0_0_0_rgba(0,0,0,0.06),6px_0_24px_rgba(0,0,0,0.04)]">
+                  flex flex-col"
+           style="background: var(--soft); border-right: 1px solid var(--border);">
 
         <!-- ── Brand ── -->
-        <div class="flex items-center gap-2.5 px-5 pt-9 pb-7">
-            <!-- Icon mark -->
-            <div class="w-8 h-8 rounded-[10px] bg-gradient-to-br from-violet-500 to-violet-700
-                        flex items-center justify-center flex-shrink-0
-                        shadow-[0_4px_12px_rgba(124,58,237,0.30)]">
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <rect x="1.5" y="1.5" width="4.5" height="4.5" rx="1.2" fill="white"/>
-                    <rect x="9"   y="1.5" width="4.5" height="4.5" rx="1.2" fill="rgba(255,255,255,0.55)"/>
-                    <rect x="1.5" y="9"   width="4.5" height="4.5" rx="1.2" fill="rgba(255,255,255,0.55)"/>
-                    <rect x="9"   y="9"   width="4.5" height="4.5" rx="1.2" fill="white"/>
-                </svg>
-            </div>
-            <div class="leading-none">
-                <p class="text-[14px] font-bold text-[#1A1A2E] tracking-tight">UserKit</p>
-                <p class="text-[9.5px] font-semibold text-[#B0B0BE] tracking-[0.09em] uppercase mt-[3px]">Control Panel</p>
+        <div class="px-5 pt-8 pb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0"
+                     style="background: var(--accent); box-shadow: 0 4px 14px rgba(200,122,69,0.28);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                </div>
+                <div class="leading-none">
+                    <p class="text-[15px] font-bold tracking-tight" style="color: var(--text); font-family: 'Lora', serif;">NoteSpace</p>
+                    <p class="text-[10px] font-500 mt-[3px]" style="color: var(--muted);">Personal Workspace</p>
+                </div>
             </div>
         </div>
 
-        <!-- ── Section label ── -->
-        <p class="px-[22px] pb-2 text-[9px] font-semibold tracking-[0.12em] uppercase text-[#C4C4CE]">
-            Main Menu
-        </p>
+        <!-- ── Nav ── -->
+        <nav class="flex-1 flex flex-col px-3 overflow-y-auto sidebar-scroll pb-4">
 
-        <!-- ── Primary nav ── -->
-        <nav class="flex-1 flex flex-col gap-[3px] px-3 overflow-y-auto overflow-x-hidden
-                    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div class="sidebar-label">Workspace</div>
 
-            {{-- Dashboard --}}
-            <a href="/dashboard"
-               class="nav-link {{ activeMenu('dashboard') }}
-                        flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                        text-[13px] font-semibold">
-                <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2.5" y="2.5" width="6" height="6" rx="1.5"/>
-                    <rect x="11.5" y="2.5" width="6" height="6" rx="1.5"/>
-                    <rect x="2.5" y="11.5" width="6" height="6" rx="1.5"/>
-                    <rect x="11.5" y="11.5" width="6" height="6" rx="1.5"/>
-                </svg>
-                Dashboard
-            </a>
+            <div class="flex flex-col gap-[2px]">
+                <a href="/dashboard" class="nav-item {{ activeMenu('dashboard') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                    </svg>
+                    Dashboard
+                </a>
 
-            {{-- Users --}}
-            <a href="/notes"
-               class="nav-link {{ activeMenu('notes') }}
-                      flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                      text-[13px] font-medium text-[#7A7A8C]
-                      hover:bg-black/[0.045] hover:text-[#3D3D52]">
-                <svg class="w-[18px] h-[18px] shrink-0 opacity-75" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                    <path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6"/>
-                </svg>
-                All notes
-            </a>
+                <a href="/notes" class="nav-item {{ activeMenu('notes') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>
+                    </svg>
+                    All Notes
+                </a>
 
-            {{-- Favorites --}}
-            <a href="/favorites"
-               class="nav-link {{ activeMenu('favorites') }}
-                      flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                      text-[13px] font-medium text-[#7A7A8C]
-                      hover:bg-black/[0.045] hover:text-[#3D3D52]">
-                <svg class="w-[18px] h-[18px] shrink-0 opacity-75" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3"  y="11" width="4" height="6" rx="1"/>
-                    <rect x="8"  y="7"  width="4" height="10" rx="1"/>
-                    <rect x="13" y="3"  width="4" height="14" rx="1"/>
-                </svg>
-                Favorites
-            </a>
-            
+                <a href="/favorites" class="nav-item {{ activeMenu('favorites') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>
+                    </svg>
+                    Favorites
+                </a>
 
-            {{-- Category --}}
-            <a href="/category"
-               class="nav-link {{ activeMenu('category') }}
-                      flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                      text-[13px] font-medium text-[#7A7A8C]
-                      hover:bg-black/[0.045] hover:text-[#3D3D52]">
-                <svg class="w-[18px] h-[18px] shrink-0 opacity-75" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M13 9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
-                    <path d="M6.5 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
-                    <path d="M17 16.5c0-2.485-1.791-4.5-4-4.5s-4 2.015-4 4.5"/>
-                    <path d="M2.5 16.5c0-2.071 1.79-3.75 4-3.75"/>
-                </svg>
-                Category
-            </a>
+                <a href="/category" class="nav-item {{ activeMenu('category') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>
+                    </svg>
+                    Category
+                </a>
 
-            {{-- Payroll --}}
-            <a href="/archived"
-               class="nav-link {{ activeMenu('archived') }}
-                      flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                      text-[13px] font-medium text-[#7A7A8C]
-                      hover:bg-black/[0.045] hover:text-[#3D3D52]">
-                <svg class="w-[18px] h-[18px] shrink-0 opacity-75" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="5" width="16" height="11" rx="2"/>
-                    <path d="M6 5V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"/>
-                    <circle cx="10" cy="11" r="2"/>
-                    <path d="M6 13.5h1M13 13.5h1"/>
-                </svg>
-                Archived
-            </a>
+                <a href="/archived" class="nav-item {{ activeMenu('archived') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="5" rx="2"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/>
+                        <path d="M10 13h4"/>
+                    </svg>
+                    Archived
+                </a>
 
-            {{-- Attendance --}}
-            <a href="/trash"
-               class="nav-link {{ activeMenu('trash') }}
-                      flex items-center gap-3 px-3 py-[10px] rounded-[14px]
-                      text-[13px] font-medium text-[#7A7A8C]
-                      hover:bg-black/[0.045] hover:text-[#3D3D52]">
-                <svg class="w-[18px] h-[18px] shrink-0 opacity-75" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="14" height="13" rx="2"/>
-                    <path d="M3 8h14"/>
-                    <path d="M8 2v3M12 2v3"/>
-                    <path d="M7 12.5l2 2 4-4"/>
-                </svg>
-                Trash
-            </a>
-            
+                <a href="/trash" class="nav-item {{ activeMenu('trash') }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Trash
+                </a>
+            </div>
 
-            <livewire:user.sidebar-notebooks />
+            <!-- Notebooks -->
+            <div class="mt-5 pt-4" style="border-top: 1px solid var(--border);">
+                <livewire:user.sidebar-notebooks />
+            </div>
+
         </nav>
 
-    </aside>
+        <!-- ── Sidebar Footer ── -->
+        <div class="px-4 py-4" style="border-top: 1px solid var(--border);">
+            <div class="flex items-center gap-3 px-2 py-2 rounded-[11px] transition-colors cursor-pointer"
+                 style="color: var(--muted);"
+                 onmouseover="this.style.background='var(--hover)'"
+                 onmouseout="this.style.background='transparent'">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0"
+                     style="background: var(--accent);">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-[12px] font-600 truncate" style="color: var(--text); font-weight: 600;">{{ Auth::user()->name }}</p>
+                    <p class="text-[10px] truncate" style="color: var(--muted);">{{ Auth::user()->email }}</p>
+                </div>
+            </div>
+        </div>
 
-    {{-- NOTEBOOKS --}}     
-   
-    
+    </aside>
     <!-- ══ END SIDEBAR ══ -->
 
 
     <!-- ══════════════════════════════════════════
          MAIN CONTENT
     ══════════════════════════════════════════ -->
-    <div class="flex-1 flex flex-col md:ml-[220px] min-w-0">
-           
+    <div class="flex-1 flex flex-col md:ml-[260px] min-w-0" style="background: var(--bg);">
 
         <!-- Navbar -->
-        <header class="bg-white/90 backdrop-blur-sm sticky top-0 z-30
-                       border-b border-black/[0.06]
-                       px-5 py-3.5 flex items-center justify-between">
+        <header class="sticky top-0 z-30 px-6 py-4 flex items-center justify-between"
+                style="background: rgba(255,255,255,0.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);">
 
             <!-- Mobile hamburger -->
             <button onclick="toggleSidebar()"
-                    class="md:hidden w-9 h-9 rounded-xl flex items-center justify-center
-                           text-gray-500 hover:bg-gray-100 transition-colors">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                     stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                    <path d="M3 5.5h14M3 10h14M3 14.5h14"/>
+                    class="md:hidden w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
+                    style="color: var(--muted);"
+                    onmouseover="this.style.background='var(--hover)'"
+                    onmouseout="this.style.background='transparent'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                    <path d="M3 6h18M3 12h18M3 18h18"/>
                 </svg>
             </button>
 
-            <h1 class="text-[16px] font-semibold text-gray-800 tracking-tight">Dashboard</h1>
+            <h1 class="text-[17px] font-bold tracking-tight" style="color: var(--text); font-family: 'Lora', serif;">Dashboard</h1>
 
             <!-- Profile Dropdown -->
             <div class="relative">
-
                 <button
                     onclick="toggleProfileMenu()"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 transition">
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-[12px] transition-colors"
+                    style="border: 1px solid var(--border);"
+                    onmouseover="this.style.background='var(--hover)'"
+                    onmouseout="this.style.background='transparent'">
 
-                    <div class="w-8 h-8 rounded-full
-                                bg-gradient-to-br from-violet-500 to-violet-700
-                                flex items-center justify-center
-                                text-white text-xs font-semibold">
-
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0"
+                         style="background: var(--accent);">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-
                     </div>
 
-                    <svg class="w-4 h-4 text-gray-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <span class="text-[13px] font-500 hidden sm:block" style="color: var(--text); font-weight: 500;">
+                        {{ Auth::user()->name }}
+                    </span>
 
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 9l-7 7-7-7"/>
-
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--muted);">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
-
                 </button>
 
                 <!-- Dropdown -->
                 <div id="profileMenu"
-                class="hidden absolute right-0 mt-2 w-48
-                        bg-white rounded-2xl border border-gray-200
-                        shadow-lg overflow-hidden z-50">
+                     class="hidden absolute right-0 mt-2 w-52 z-50 overflow-hidden"
+                     style="background: #fff; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.08);">
 
-                <div class="px-4 py-3 border-b border-gray-100">
-
-                    <div class="flex items-center gap-3">
-
-                        <div class="w-9 h-9 rounded-full
-                                    bg-gradient-to-br from-violet-500 to-violet-700
-                                    flex items-center justify-center
-                                    text-white text-sm font-semibold">
-
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-
+                    <!-- User info -->
+                    <div class="px-4 py-3.5" style="border-bottom: 1px solid var(--border);">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold text-white flex-shrink-0"
+                                 style="background: var(--accent);">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-[13px] font-semibold truncate" style="color: var(--text);">{{ Auth::user()->name }}</p>
+                                <p class="text-[11px] truncate" style="color: var(--muted);">{{ Auth::user()->email }}</p>
+                            </div>
                         </div>
-
-                        <div class="min-w-0">
-
-                            <p class="text-sm font-semibold text-gray-800 truncate">
-                                {{ Auth::user()->name }}
-                            </p>
-
-                            <p class="text-xs text-gray-400 truncate">
-                                {{ Auth::user()->email }}
-                            </p>
-
-                        </div>
-
                     </div>
 
+                    <div class="py-1.5">
+                        <a href="/edit-profile" class="dropdown-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit Profile
+                        </a>
+
+                        <form action="/logout" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item danger w-full text-left">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                                </svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
-
-                <a href="/edit-profile"
-                    class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-violet-50">
-
-                    ✏️ Edit Profile
-
-                </a>
-
-                <form action="/logout" method="POST">
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
-
-                        🚪 Logout
-
-                    </button>
-
-                </form>
-
             </div>
-
-            </div>
-            </header>
-            
+        </header>
 
         <!-- Content -->
-        <main class="p-6 overflow-y-auto flex-1">
+        <main class="p-8 overflow-y-auto flex-1">
             @yield('content')
         </main>
-        
+
     </div>
-    
+
 </div>
-<livewire:user.notebook-modal /> 
+
+<livewire:user.notebook-modal />
 
 @livewireScripts
 </body>
