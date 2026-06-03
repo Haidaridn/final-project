@@ -476,7 +476,7 @@
                         </button>
 
                         <button
-                            wire:click="forceDelete({{ $note->id }})"
+                            wire:click="confirmDelete({{ $note->id }})"
                             class="an-trash-button an-btn-delete">
                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -517,4 +517,72 @@
         </div>
 
     </div>
+
+    <div
+    id="deleteToast"
+    style="
+        position:fixed;
+        bottom:30px;
+        right:30px;
+        background:white;
+        border:1px solid #FECACA;
+        border-radius:18px;
+        padding:18px;
+        width:320px;
+        box-shadow:0 12px 30px rgba(0,0,0,.12);
+        display:none;
+        z-index:9999;
+    "
+>
+    <h4 style="margin:0 0 8px;font-weight:700;">
+        Delete Forever?
+    </h4>
+
+    <p style="margin:0 0 16px;color:#6B6B6B;">
+        This note will be permanently deleted and cannot be restored.
+    </p>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button
+            onclick="hideDeleteToast()"
+            style="
+                padding:8px 14px;
+                border:1px solid #EAE4DB;
+                border-radius:10px;
+                background:white;
+                cursor:pointer;
+            ">
+            Cancel
+        </button>
+
+        <button
+            onclick="Livewire.dispatch('deleteConfirmed')"
+            style="
+                padding:8px 14px;
+                border:none;
+                border-radius:10px;
+                background:#DC2626;
+                color:white;
+                cursor:pointer;
+            ">
+            Delete
+        </button>
+    </div>
 </div>
+</div>
+
+<script>
+    const toast = document.getElementById('deleteToast');
+
+    function hideDeleteToast() {
+        toast.style.display = 'none';
+    }
+
+    window.addEventListener('show-delete-toast', () => {
+        toast.style.display = 'block';
+    });
+
+    window.addEventListener('note-deleted', () => {
+        toast.style.display = 'none';
+    });
+</script>

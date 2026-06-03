@@ -3,33 +3,19 @@
 namespace App\Livewire\User;
 
 use App\Models\Note;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class NoteDetail extends Component
 {
-    public $title;
-    public $content;
+    public Note $note;
 
     public function mount(Note $note)
     {
-
-        $this->title = $note->title;
-        $this->content = $note->content;
+        $this->note = $note;
     }
 
-    public function saveAndBack()
+    public function render()
     {
-        $this->note->update([
-            'title' => $this->title,
-            'content' => $this->content,
-        ]);
-
-        return redirect('/notes');
+        return view('detil-note');
     }
-
-public function render()
-{
-    return view('livewire.user.note-detail');
-}
 }

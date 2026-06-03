@@ -1192,7 +1192,9 @@
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Edit
                 </button>
-                <button wire:click.stop="delete({{ $note->id }})" wire:confirm="Delete this note?" class="ns-btn-action ns-btn-delete">
+                <button
+                    onclick="event.stopPropagation(); confirmDelete({{ $note->id }})"
+                    class="ns-btn-action ns-btn-delete">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     Delete
                 </button>
@@ -1311,3 +1313,104 @@
 @endif
 
 </div>
+
+<script>
+document.addEventListener('livewire:init', () => {
+
+    Livewire.on('note-saved', (event) => {
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Note Saved',
+        text: event.message,
+        background: '#FFFFFF',
+        color: '#2B2B2B',
+        confirmButtonColor: '#C87A45',
+        showConfirmButton: false,
+        timer: 2200,
+        timerProgressBar: true,
+        customClass: {
+            popup: 'rounded-3xl'
+        }
+    });
+
+    });
+
+});
+
+function confirmDelete(noteId) {
+
+    Swal.fire({
+        title: 'Delete Note?',
+        text: 'Are you sure you want to delete this note?',
+        icon: 'warning',
+        showCancelButton: true,
+
+        confirmButtonColor: '#C87A45',
+        cancelButtonColor: '#D1D5DB',
+
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel',
+
+        background: '#FFFFFF',
+        color: '#2B2B2B'
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+            Livewire.dispatch('delete-note', {
+                id: noteId
+            });
+        }
+
+    });
+}
+
+document.addEventListener('livewire:init', () => {
+
+    Livewire.on('note-deleted', (event) => {
+
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: event.message,
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+
+            background: '#FFFFFF',
+            color: '#2B2B2B'
+        });
+
+    });
+
+});
+
+document.addEventListener('livewire:init', () => {
+
+    Livewire.on('note-archived', (event) => {
+
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+
+            icon: 'success',
+            title: 'Note archived successfully.',
+
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true,
+
+            background: '#FFFFFF',
+            color: '#2B2B2B',
+
+            customClass: {
+                popup: 'rounded-3xl'
+            }
+        });              
+
+    });
+
+});
+</script>
+

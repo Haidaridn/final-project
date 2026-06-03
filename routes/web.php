@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Models\Category;
 use App\Livewire\User\Notes;
 use App\Http\Controllers\NoteController;
+use App\Models\Note;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,6 +51,7 @@ Route::middleware('auth')->group(function () {
         return view('edit');
     });
 
-    Route::get('/notes/{note}', \App\Livewire\User\NoteDetail::class)
-        ->name('notes.show');
+    Route::get('/notes/{note}', function (Note $note) {
+        return view('detil-note', compact('note'));
+    })->name('notes.show');
     });

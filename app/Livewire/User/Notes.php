@@ -8,6 +8,7 @@ use Livewire\Component;
 use App\Models\Category;
 use Livewire\Attributes\On;
 
+
 class Notes extends Component
         {
             public $search = '';
@@ -59,6 +60,7 @@ class Notes extends Component
                         'category_id' => $this->category_id,
                     ]);
 
+                    $message = 'Note updated successfully!';
                 } else {
 
                     Note::create([
@@ -67,11 +69,14 @@ class Notes extends Component
                         'category_id' => $this->category_id,
                         'user_id' => Auth::id(),
                     ]);
+
+                    $message = 'Note created successfully!';
                 }
 
                 $this->closeModal();
-
                 $this->resetForm();
+
+                $this->dispatch('note-saved', message: $message);
             }
 
             // EDIT NOTE
@@ -89,9 +94,17 @@ class Notes extends Component
             }
 
             // DELETE NOTE
+            #[On('delete-note')]
             public function delete($id)
             {
-                Note::where('user_id', Auth::id())->findOrFail($id)->delete();
+                Note::where('user_id', Auth::id())
+                    ->findOrFail($id)
+                    ->delete();
+
+                $this->dispatch(
+                    'note-deleted',
+                    message: 'Note deleted successfully.'
+                );
             }
 
             public function togglePin($id)
@@ -180,15 +193,18 @@ class Notes extends Component
             }
 
 
-                public function archive($id)
-                {
-                    $note = Note::where('user_id', Auth::id())
-                        ->findOrFail($id);
+            public function archive($id)
+            {
+                $note = Note::findOrFail($id);
 
-                    $note->update([
-                        'is_archived' => true,
-                    ]);
-                }
+                $note->update([
+                    'is_archived' => true
+                ]);
+
+                $this->dispatch('note-archived', [
+                    'message' => 'Note archived successfully.'
+                ]);
+            }
 
             #[On('filter-category')]
             public function filterCategory($categoryId)
