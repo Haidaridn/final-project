@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Models\Category;
 use App\Livewire\User\Notes;
+use App\Http\Controllers\NoteController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -48,4 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/edit-profile', function () {
         return view('edit');
     });
-});
+
+    Route::get('/notes/{note}', \App\Livewire\User\NoteDetail::class)
+        ->name('notes.show');
+    });
