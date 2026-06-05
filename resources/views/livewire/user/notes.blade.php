@@ -744,6 +744,7 @@
     justify-content: center;
     padding: 20px;
 }
+/* SESUDAH */
 .ns-modal {
     background: #fff;
     border: 1px solid var(--ns-border);
@@ -751,8 +752,44 @@
     padding: 34px;
     width: 100%;
     max-width: 510px;
+    max-height: 92vh;           /* ← Batasi tinggi modal maksimal 92% layar */
+    display: flex;              /* ← Flex agar bagian dalam bisa scroll */
+    flex-direction: column;     /* ← Header tetap di atas, footer tetap di bawah */
     box-shadow: 0 40px 100px rgba(0,0,0,0.16), 0 8px 32px rgba(0,0,0,0.08);
     animation: ns-scaleIn 0.36s var(--ns-spring) both;
+}
+
+/* Area form yang bisa di-scroll */
+.ns-modal .ns-form-stack {
+    overflow-y: auto;
+    flex: 1;                    /* ← Ambil sisa ruang di antara header dan footer */
+    min-height: 0;              /* ← Penting agar flex child bisa shrink */
+    padding-right: 4px;         /* ← Ruang agar scrollbar tidak menempel teks */
+
+    /* Scrollbar custom agar tetap elegan */
+    scrollbar-width: thin;
+    scrollbar-color: var(--ns-border) transparent;
+}
+.ns-modal .ns-form-stack::-webkit-scrollbar {
+    width: 4px;
+}
+.ns-modal .ns-form-stack::-webkit-scrollbar-track {
+    background: transparent;
+}
+.ns-modal .ns-form-stack::-webkit-scrollbar-thumb {
+    background: var(--ns-border);
+    border-radius: 99px;
+}
+.ns-modal .ns-form-stack::-webkit-scrollbar-thumb:hover {
+    background: rgba(200,122,69,0.35);
+}
+
+/* Header dan footer modal tidak ikut scroll */
+.ns-modal .ns-modal-head {
+    flex-shrink: 0;             /* ← Tidak ikut menyusut */
+}
+.ns-modal .ns-modal-footer {
+    flex-shrink: 0;             /* ← Selalu terlihat di bawah */
 }
 .ns-modal-head {
     display: flex;
@@ -933,6 +970,424 @@
     .ns-card-footer { flex-direction: column; align-items: flex-start; }
     .ns-card-actions { width: 100%; justify-content: flex-start; }
     .ns-modal { padding: 24px 20px; border-radius: 22px; }
+}
+
+/* ════════════════════════════════════════════
+   RICH TEXT EDITOR SYSTEM
+════════════════════════════════════════════ */
+
+.rte-editor u {
+    text-decoration: underline;
+}
+
+/* Wrapper: border luar yang menyatukan toolbar + editor */
+.rte-wrapper {
+    border: 1px solid var(--ns-border);
+    border-radius: var(--ns-radius-md);
+    background: #FDFCFB;
+    overflow: visible;          /* ← dropdown bebas keluar dari wrapper */
+    transition: border-color 0.22s, box-shadow 0.22s;
+}
+/* Kembalikan rounded corners karena overflow sudah visible */
+.rte-toolbar {
+    border-radius: var(--ns-radius-md) var(--ns-radius-md) 0 0;
+}
+.rte-editor-title,
+.rte-editor-area {
+    border-radius: 0 0 var(--ns-radius-md) var(--ns-radius-md);
+}
+.rte-wrapper:focus-within {
+    border-color: var(--ns-accent);
+    box-shadow: 0 0 0 3px rgba(200,122,69,0.10);
+    background: #fff;
+}
+
+/* Toolbar */
+.rte-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--ns-border);
+}
+
+/* Tombol toolbar — sistem reusable */
+.rte-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--ns-border);
+    background: #FAF7F2;
+    color: var(--ns-accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.18s var(--ns-ease),
+                border-color 0.18s,
+                transform 0.15s var(--ns-spring),
+                box-shadow 0.18s;
+    user-select: none;
+    line-height: 1;
+}
+.rte-btn:hover {
+    background: var(--ns-hover);
+    border-color: rgba(200,122,69,0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(200,122,69,0.15);
+}
+.rte-btn:active {
+    transform: translateY(0) scale(0.95);
+}
+/* State aktif saat format sedang aktif */
+.rte-btn.is-active {
+    background: var(--ns-accent);
+    color: #fff;
+    border-color: var(--ns-accent);
+    box-shadow: 0 3px 10px rgba(200,122,69,0.30);
+}
+.rte-btn-label {
+    font-family: Georgia, 'Lora', serif;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* Area editor contenteditable */
+.rte-editor {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ns-text);
+    line-height: 1.65;
+    outline: none;
+    background: transparent;
+    padding: 14px 18px;
+    word-break: break-word;
+}
+.rte-editor-title {
+    min-height: 52px;
+    max-height: 52px;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 52px;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+/* SESUDAH — lebih kecil agar modal tidak terlalu tinggi */
+.rte-editor-area {
+    min-height: 140px;
+    max-height: 200px;          /* ← Dibatasi, isi panjang bisa scroll di dalam editor */
+    overflow-y: auto;
+
+    /* Scrollbar custom */
+    scrollbar-width: thin;
+    scrollbar-color: var(--ns-border) transparent;
+}
+.rte-editor-area::-webkit-scrollbar {
+    width: 4px;
+}
+.rte-editor-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+.rte-editor-area::-webkit-scrollbar-thumb {
+    background: var(--ns-border);
+    border-radius: 99px;
+}
+.rte-editor-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(200,122,69,0.35);
+}
+
+/* Placeholder via CSS */
+.rte-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #C0B4A8;
+    pointer-events: none;
+    display: block;
+    font-weight: 400;
+}
+.rte-editor-title:empty::before {
+    line-height: 52px;
+}
+
+/* Strong/bold di dalam editor tampil lebih tegas */
+.rte-editor strong,
+.rte-editor b {
+    font-weight: 700;
+    color: var(--ns-text);
+}
+/* ════════════════════════════════════════════
+   COLOR PICKER SYSTEM
+════════════════════════════════════════════ */
+
+.rte-separator {
+    width: 1px;
+    height: 20px;
+    background: var(--ns-border);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+/* Tombol warna — lebih lebar karena ada indikator */
+.rte-color-btn {
+    width: auto !important;
+    padding: 0 10px;
+    gap: 6px;
+    position: relative;
+}
+
+/* Bulatan indikator warna aktif */
+.rte-color-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    flex-shrink: 0;
+    transition: background 0.18s;
+}
+
+/* Wrapper posisi relatif agar dropdown muncul di bawah tombol */
+.rte-color-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+/* Dropdown panel */
+.rte-color-dropdown {
+    position: fixed;            /* ← fixed agar tidak terpotong apapun */
+    z-index: 99999;
+    background: #fff;
+    border: 1px solid var(--ns-border);
+    border-radius: 16px;
+    padding: 14px;
+    width: 194px;
+    box-shadow: 0 12px 40px rgba(43,43,43,0.13), 0 2px 8px rgba(43,43,43,0.06);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(6px) scale(0.97);
+    transform-origin: top left;
+    transition: opacity 0.20s var(--ns-ease),
+                transform 0.20s var(--ns-ease),
+                visibility 0.20s;
+    pointer-events: none;
+}
+.rte-color-dropdown.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.rte-color-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #C0B4A8;
+    margin-bottom: 10px;
+}
+
+/* Grid swatch warna */
+.rte-color-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.rte-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s var(--ns-spring),
+                border-color 0.15s,
+                box-shadow 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.rte-swatch:hover {
+    transform: scale(1.18);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+}
+.rte-swatch.is-active {
+    border-color: var(--ns-accent);
+    box-shadow: 0 0 0 3px rgba(200,122,69,0.20);
+    transform: scale(1.12);
+}
+
+/* Swatch tambah custom */
+.rte-swatch-custom {
+    background: var(--ns-soft);
+    border: 1.5px dashed var(--ns-border) !important;
+    color: var(--ns-muted);
+}
+.rte-swatch-custom:hover {
+    background: var(--ns-hover);
+    border-color: var(--ns-accent) !important;
+    color: var(--ns-accent);
+}
+
+/* Input color native — tersembunyi, dipanggil via JS */
+.rte-custom-color {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Tombol reset warna */
+.rte-color-reset {
+    width: 100%;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--ns-border);
+    background: var(--ns-soft);
+    color: var(--ns-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.18s;
+    margin-top: 4px;
+}
+.rte-color-reset:hover {
+    background: var(--ns-hover);
+    border-color: rgba(200,122,69,0.30);
+    color: var(--ns-text);
+}
+/* ════════════════════════════════════════════
+   FREE COLOR INPUT (tanpa batasan)
+════════════════════════════════════════════ */
+.rte-free-color-wrap {
+    border-top: 1px solid var(--ns-border);
+    padding-top: 10px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.rte-free-color-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Native color picker — visible, ukuran pas */
+.rte-free-color-input {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--ns-border);
+    padding: 2px;
+    cursor: pointer;
+    background: none;
+    flex-shrink: 0;
+}
+.rte-free-color-input::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+.rte-free-color-input::-webkit-color-swatch { border: none; border-radius: 6px; }
+
+/* Input HEX manual */
+.rte-free-color-hex {
+    flex: 1;
+    height: 32px;
+    border: 1px solid var(--ns-border);
+    border-radius: 8px;
+    padding: 0 8px;
+    font-family: 'DM Sans', monospace;
+    font-size: 12px;
+    color: var(--ns-text);
+    background: var(--ns-soft);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    min-width: 0;
+}
+.rte-free-color-hex:focus {
+    border-color: var(--ns-accent);
+    box-shadow: 0 0 0 2px rgba(200,122,69,0.10);
+    background: #fff;
+}
+
+/* Tombol Apply */
+.rte-free-color-apply {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: none;
+    background: var(--ns-accent);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s, transform 0.15s var(--ns-spring);
+}
+.rte-free-color-apply:hover {
+    background: var(--ns-accent-h);
+    transform: translateY(-1px);
+}
+
+/* Dropdown lebih lebar untuk akomodasi free color */
+.rte-color-dropdown {
+    width: 210px !important;
+}
+
+/* Sembunyikan swatch "+" lama karena sudah ada free color di bawah */
+.rte-swatch-custom {
+    display: none !important;
+}
+/* ════════════════════════════════════════════
+   FONT SIZE SELECT
+════════════════════════════════════════════ */
+.rte-size-wrap {
+    display: inline-flex;
+    align-items: center;
+}
+
+.rte-size-select {
+    height: 32px;
+    padding: 0 24px 0 10px;
+    border: 1px solid var(--ns-border);
+    border-radius: 8px;
+    background: #FAF7F2;
+    color: var(--ns-accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23C87A45' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: border-color 0.18s, background-color 0.18s, box-shadow 0.18s;
+    min-width: 72px;
+}
+.rte-size-select:hover {
+    background-color: var(--ns-hover);
+    border-color: rgba(200,122,69,0.35);
+    box-shadow: 0 3px 10px rgba(200,122,69,0.15);
+}
+.rte-size-select:focus {
+    border-color: var(--ns-accent);
+    box-shadow: 0 0 0 2px rgba(200,122,69,0.12);
+    background-color: #fff;
 }
 </style>
 
@@ -1149,7 +1604,7 @@
                     <span class="ns-cat-dot" style="background: {{ $note->category->color ?? 'var(--ns-border)' }};"></span>
                     <span class="ns-cat-name">{{ $note->category->genre ?? 'Uncategorized' }}</span>
                 </div>
-                <h2 class="ns-card-title">{{ $note->title }}</h2>
+                <h2 class="ns-card-title">{!! $note->title !!}</h2>
                 <p class="ns-card-time">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                     {{ $note->created_at->diffForHumans() }}
@@ -1176,8 +1631,9 @@
         </div>
 
         <!-- CONTENT PREVIEW -->
-        <p class="ns-card-content">{{ Str::limit($note->content, 160) }}</p>
 
+        <div class="ns-card-content">{!! Str::limit(strip_tags($note->content, '<strong><b><em><i><u><span><font>'), 160) !!}</div>
+            
         <!-- FOOTER -->
         <div class="ns-card-footer">
             <span class="ns-cat-badge" style="background: {{ $note->category->color ?? '#6B6B6B' }};">
@@ -1259,32 +1715,172 @@
         <!-- Form Fields -->
         <div class="ns-form-stack">
 
+            <!-- TITLE FIELD -->
             <div>
                 <label class="ns-form-label">Title</label>
-                <input
-                    type="text"
-                    wire:model="title"
-                    placeholder="Give your note a title..."
-                    class="ns-input ns-input-text"
-                >
+                <div class="rte-wrapper">
+                    <div class="rte-toolbar">
+
+                    <button type="button" class="rte-btn" data-cmd="bold" data-target="rte-title" title="Bold (Ctrl+B)">
+                        <span class="rte-btn-label">B</span>
+                    </button>
+                    <button type="button" class="rte-btn" data-cmd="italic" data-target="rte-title" title="Italic (Ctrl+I)"
+                            style="font-style: italic; font-family: Georgia, serif;">
+                        I
+                    </button>
+
+                    <button type="button" class="rte-btn" data-cmd="underline" data-target="rte-title" title="Underline (Ctrl+U)"
+                            style="text-decoration: underline; font-family: Georgia, serif;">
+                        U
+                    </button>
+
+                    <div class="rte-size-wrap">
+                        <select class="rte-size-select" id="rte-size-title" title="Font Size">
+                            <option value="">Size</option>
+                            <option value="1">10px</option>
+                            <option value="2">13px</option>
+                            <option value="3">16px</option>
+                            <option value="4">18px</option>
+                            <option value="5">24px</option>
+                            <option value="6">32px</option>
+                            <option value="7">48px</option>
+                        </select>
+                    </div>
+
+                    <div class="rte-separator"></div>
+                        <div class="rte-color-wrap" title="Text Color">
+                            <button type="button" class="rte-btn rte-color-btn" id="rte-color-btn-title">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+                                <span class="rte-color-indicator" id="rte-color-ind-title" style="background:#2B2B2B;"></span>
+                            </button>
+                            <div class="rte-color-dropdown" id="rte-color-dd-title">
+                                <p class="rte-color-label">Text Color</p>
+                                <div class="rte-color-grid" data-target="rte-title">
+                                    <button class="rte-swatch" data-color="#2B2B2B" style="background:#2B2B2B;" title="Default"></button>
+                                    <button class="rte-swatch" data-color="#C87A45" style="background:#C87A45;" title="Accent"></button>
+                                    <button class="rte-swatch" data-color="#DC2626" style="background:#DC2626;" title="Red"></button>
+                                    <button class="rte-swatch" data-color="#D49A45" style="background:#D49A45;" title="Yellow"></button>
+                                    <button class="rte-swatch" data-color="#4F7A5A" style="background:#4F7A5A;" title="Green"></button>
+                                    <button class="rte-swatch" data-color="#3B82F6" style="background:#3B82F6;" title="Blue"></button>
+                                    <button class="rte-swatch" data-color="#8B5CF6" style="background:#8B5CF6;" title="Purple"></button>
+                                    <button class="rte-swatch" data-color="#EC4899" style="background:#EC4899;" title="Pink"></button>
+                                    <button class="rte-swatch" data-color="#6B7280" style="background:#6B7280;" title="Gray"></button>
+                                    <button class="rte-swatch rte-swatch-custom" data-color="custom" title="Custom Color">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    </button>
+                                </div>
+                                {{-- Input color bebas tanpa batasan --}}
+                                <div class="rte-free-color-wrap">
+                                    <label class="rte-color-label" style="margin-bottom:6px; display:block;">Custom Color</label>
+                                    <div class="rte-free-color-row">
+                                        <input type="color" class="rte-free-color-input" id="rte-free-color-title" value="#2B2B2B">
+                                        <input type="text" class="rte-free-color-hex" id="rte-free-hex-title" value="#2B2B2B" placeholder="#000000" maxlength="7">
+                                        <button type="button" class="rte-free-color-apply" id="rte-free-apply-title">Apply</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="rte-color-reset" data-target="rte-title" id="rte-color-reset-title">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                    Reset Color
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        id="rte-title"
+                        class="rte-editor rte-editor-title"
+                        contenteditable="true"
+                        data-placeholder="Give your note a title..."
+                        wire:ignore
+                    ></div>
+                </div>
+                <input type="hidden" wire:model="title" id="rte-title-sync">
             </div>
 
+            <!-- CONTENT FIELD -->
             <div>
                 <label class="ns-form-label">Content</label>
-                <textarea
-                    wire:model="content"
-                    rows="5"
-                    placeholder="Write your thoughts here..."
-                    class="ns-input ns-input-area"
-                ></textarea>
+                <div class="rte-wrapper">
+                    <div class="rte-toolbar">
+                        <button type="button" class="rte-btn" data-cmd="bold" data-target="rte-content" title="Bold (Ctrl+B)">
+                            <span class="rte-btn-label">B</span>
+                        </button>
+                        <button type="button" class="rte-btn" data-cmd="italic" data-target="rte-content" title="Italic (Ctrl+I)"
+                                style="font-style: italic; font-family: Georgia, serif;">
+                            I
+                        </button>
+
+                        <button type="button" class="rte-btn" data-cmd="underline" data-target="rte-content" title="Underline (Ctrl+U)"
+                                style="text-decoration: underline; font-family: Georgia, serif;">
+                            U
+                        </button>
+
+                        <div class="rte-size-wrap">
+                            <select class="rte-size-select" id="rte-size-content" title="Font Size">
+                                <option value="">Size</option>
+                                <option value="1">10px</option>
+                                <option value="2">13px</option>
+                                <option value="3">16px</option>
+                                <option value="4">18px</option>
+                                <option value="5">24px</option>
+                                <option value="6">32px</option>
+                                <option value="7">48px</option>
+                            </select>
+                        </div>
+
+                        <div class="rte-separator"></div>
+                        <div class="rte-color-wrap" title="Text Color">
+                            <button type="button" class="rte-btn rte-color-btn" id="rte-color-btn-content">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+                                <span class="rte-color-indicator" id="rte-color-ind-content" style="background:#2B2B2B;"></span>
+                            </button>
+                            <div class="rte-color-dropdown" id="rte-color-dd-content">
+                                <p class="rte-color-label">Text Color</p>
+                                <div class="rte-color-grid" data-target="rte-content">
+                                    <button class="rte-swatch" data-color="#2B2B2B" style="background:#2B2B2B;" title="Default"></button>
+                                    <button class="rte-swatch" data-color="#C87A45" style="background:#C87A45;" title="Accent"></button>
+                                    <button class="rte-swatch" data-color="#DC2626" style="background:#DC2626;" title="Red"></button>
+                                    <button class="rte-swatch" data-color="#D49A45" style="background:#D49A45;" title="Yellow"></button>
+                                    <button class="rte-swatch" data-color="#4F7A5A" style="background:#4F7A5A;" title="Green"></button>
+                                    <button class="rte-swatch" data-color="#3B82F6" style="background:#3B82F6;" title="Blue"></button>
+                                    <button class="rte-swatch" data-color="#8B5CF6" style="background:#8B5CF6;" title="Purple"></button>
+                                    <button class="rte-swatch" data-color="#EC4899" style="background:#EC4899;" title="Pink"></button>
+                                    <button class="rte-swatch" data-color="#6B7280" style="background:#6B7280;" title="Gray"></button>
+                                    <button class="rte-swatch rte-swatch-custom" data-color="custom" title="Custom Color">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    </button>
+                                </div>
+                                {{-- Input color bebas tanpa batasan --}}
+                                <div class="rte-free-color-wrap">
+                                    <label class="rte-color-label" style="margin-bottom:6px; display:block;">Custom Color</label>
+                                    <div class="rte-free-color-row">
+                                        <input type="color" class="rte-free-color-input" id="rte-free-color-content" value="#2B2B2B">
+                                        <input type="text" class="rte-free-color-hex" id="rte-free-hex-content" value="#2B2B2B" placeholder="#000000" maxlength="7">
+                                        <button type="button" class="rte-free-color-apply" id="rte-free-apply-content">Apply</button>
+                                    </div>
+                                </div>
+                                <button type="button" class="rte-color-reset" data-target="rte-content" id="rte-color-reset-content">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                                    Reset Color
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        id="rte-content"
+                        class="rte-editor rte-editor-area"
+                        contenteditable="true"
+                        data-placeholder="Write your thoughts here..."
+                        wire:ignore
+                    ></div>
+                </div>
+                <input type="hidden" wire:model="content" id="rte-content-sync">
             </div>
 
+            <!-- CATEGORY -->
             <div>
                 <label class="ns-form-label">Category</label>
                 <div class="ns-select-wrap">
-                    <select
-                        wire:model="category_id"
-                        class="ns-input ns-input-select">
+                    <select wire:model="category_id" class="ns-input ns-input-select">
                         <option value="">Select a category...</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->genre }}</option>
@@ -1315,60 +1911,407 @@
 </div>
 
 <script>
-document.addEventListener('livewire:init', () => {
+/* ════════════════════════════════════════════
+   RICH TEXT EDITOR SYSTEM — Livewire Compatible
+════════════════════════════════════════════ */
 
-    Livewire.on('note-saved', (event) => {
+class RteEditor {
+    constructor(editorId, syncId) {
+        this.editor   = document.getElementById(editorId);
+        this.syncEl   = document.getElementById(syncId);
+        this.editorId = editorId;
 
-    Swal.fire({
-        icon: 'success',
-        title: 'Note Saved',
-        text: event.message,
-        background: '#FFFFFF',
-        color: '#2B2B2B',
-        confirmButtonColor: '#C87A45',
-        showConfirmButton: false,
-        timer: 2200,
-        timerProgressBar: true,
-        customClass: {
-            popup: 'rounded-3xl'
+        // Ambil suffix sekali, dipakai konsisten di semua method
+        this.suffix   = editorId === 'rte-title' ? 'title' : 'content';
+
+        if (!this.editor || !this.syncEl) return;
+
+        this._bindEditor();
+        this._bindToolbarButtons();
+        this._bindSelectionChange();
+        this._initColorPicker();
+        this._initFontSize();
+    }
+
+    _sync() {
+        const html  = this.editor.innerHTML;
+        const clean = html === '<br>' ? '' : html;
+        this.syncEl.value = clean;
+        this.syncEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    setContent(html) {
+        if (!this.editor) return;
+        this.editor.innerHTML = html || '';
+        this._sync();
+    }
+
+    clearContent() {
+        if (!this.editor) return;
+        this.editor.innerHTML = '';
+        this._sync();
+    }
+
+    _bindEditor() {
+        this.editor.addEventListener('input', () => this._sync());
+
+        this.editor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedHtml = (e.clipboardData || window.clipboardData)
+                .getData('text/html') ||
+                (e.clipboardData || window.clipboardData).getData('text/plain');
+            const safe = this._sanitize(pastedHtml);
+            document.execCommand('insertHTML', false, safe);
+            this._sync();
+        });
+
+    this.editor.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+            e.preventDefault();
+            this._execCmd('bold');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+            e.preventDefault();
+            this._execCmd('italic');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+            e.preventDefault();
+            this._execCmd('underline');
         }
     });
+    }
 
-    });
+    _sanitize(html) {
+        const div     = document.createElement('div');
+        div.innerHTML = html;
+        const allowed = ['STRONG', 'B', 'EM', 'I', 'U', 'BR', 'P', 'SPAN', 'FONT'];
+        const walk    = (node) => {
+            [...node.childNodes].forEach(child => {
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    if (!allowed.includes(child.tagName)) {
+                        child.replaceWith(...child.childNodes);
+                    } else {
+                        [...child.attributes].forEach(attr => {
+                            if (!['style', 'color'].includes(attr.name)) {
+                                child.removeAttribute(attr.name);
+                            }
+                        });
+                        walk(child);
+                    }
+                }
+            });
+        };
+        walk(div);
+        return div.innerHTML;
+    }
 
-});
+    _execCmd(cmd, value = null) {
+        this.editor.focus();
+        document.execCommand(cmd, false, value);
+        this._sync();
+        this._updateButtonStates();
+    }
 
-function confirmDelete(noteId) {
+    _bindToolbarButtons() {
+        // Hanya bind tombol yang punya data-cmd dan data-target sesuai editor ini
+        // Kecualikan tombol color (tidak punya data-cmd) dan swatch/reset
+        this.editor.closest('.rte-wrapper')
+            .querySelectorAll(`[data-cmd]`)
+            .forEach(btn => {
+                btn.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    const cmd = btn.getAttribute('data-cmd');
+                    if (cmd) this._execCmd(cmd);
+                });
+            });
+    }
 
-    Swal.fire({
-        title: 'Delete Note?',
-        text: 'Are you sure you want to delete this note?',
-        icon: 'warning',
-        showCancelButton: true,
+    _updateButtonStates() {
+        this.editor.closest('.rte-wrapper')
+            .querySelectorAll('[data-cmd]')
+            .forEach(btn => {
+                const cmd = btn.getAttribute('data-cmd');
+                try {
+                    if (document.queryCommandState(cmd)) {
+                        btn.classList.add('is-active');
+                    } else {
+                        btn.classList.remove('is-active');
+                    }
+                } catch(e) {}
+            });
+    }
 
-        confirmButtonColor: '#C87A45',
-        cancelButtonColor: '#D1D5DB',
+    _bindSelectionChange() {
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                if (this.editor.contains(range.commonAncestorContainer)) {
+                    this._updateButtonStates();
+                }
+            }
+        });
+    }
 
-        confirmButtonText: 'Yes, Delete',
-        cancelButtonText: 'Cancel',
+    /* ════════════════════════════════════════
+       COLOR PICKER
+    ════════════════════════════════════════ */
+    _initColorPicker() {
+        const s = this.suffix; // 'title' atau 'content'
 
-        background: '#FFFFFF',
-        color: '#2B2B2B'
-    }).then((result) => {
+        this.colorBtn      = document.getElementById(`rte-color-btn-${s}`);
+        this.colorDropdown = document.getElementById(`rte-color-dd-${s}`);
+        this.colorInd      = document.getElementById(`rte-color-ind-${s}`);
+        this.resetBtn      = document.getElementById(`rte-color-reset-${s}`);
 
-        if (result.isConfirmed) {
-            Livewire.dispatch('delete-note', {
-                id: noteId
+        if (!this.colorBtn || !this.colorDropdown) return;
+
+        this._savedRange  = null;
+        this._activeColor = '#2B2B2B';
+
+        /* ── Buka / tutup dropdown ── */
+        this.colorBtn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this._saveSelection();
+            this._toggleDropdown();
+        });
+
+        /* ── Swatch preset ── */
+        const grid = this.colorDropdown.querySelector('.rte-color-grid');
+        grid.querySelectorAll('.rte-swatch').forEach(swatch => {
+            swatch.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const color = swatch.getAttribute('data-color');
+                if (!color || color === 'custom') return;
+                this._applyColor(color);
+                grid.querySelectorAll('.rte-swatch').forEach(s => s.classList.remove('is-active'));
+                swatch.classList.add('is-active');
+                this._closeDropdown();
+            });
+        });
+
+        /* ── Reset warna ── */
+        if (this.resetBtn) {
+            this.resetBtn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this._applyColor('#2B2B2B');
+                grid.querySelectorAll('.rte-swatch').forEach(sw => sw.classList.remove('is-active'));
+                grid.querySelector('[data-color="#2B2B2B"]')?.classList.add('is-active');
+                this._closeDropdown();
             });
         }
 
-    });
+        /* ── Free color: native picker + HEX input + Apply ── */
+        const freeColorInput = document.getElementById(`rte-free-color-${s}`);
+        const freeHexInput   = document.getElementById(`rte-free-hex-${s}`);
+        const freeApplyBtn   = document.getElementById(`rte-free-apply-${s}`);
+
+        if (freeColorInput && freeHexInput && freeApplyBtn) {
+
+            // Color picker native → sync HEX
+            freeColorInput.addEventListener('input', (e) => {
+                freeHexInput.value = e.target.value;
+            });
+
+            // HEX input → sync color picker (jika valid 6 digit)
+            freeHexInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    freeColorInput.value = val;
+                }
+            });
+
+            // Tombol Apply
+            const doApply = (e) => {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                const color = freeHexInput.value.trim();
+                if (/^#[0-9A-Fa-f]{3,6}$/.test(color)) {
+                    this._applyColor(color);
+                    freeColorInput.value = color;
+                    freeHexInput.value   = color;
+                    grid.querySelectorAll('.rte-swatch').forEach(sw => sw.classList.remove('is-active'));
+                    this._closeDropdown();
+                }
+            };
+
+            freeApplyBtn.addEventListener('mousedown', doApply);
+
+            // Enter di HEX input = Apply
+            freeHexInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    doApply(null);
+                }
+            });
+
+            // Cegah dropdown tertutup saat interaksi di dalam free color area
+            freeColorInput.addEventListener('mousedown', (e) => e.stopPropagation());
+            freeHexInput.addEventListener('mousedown',   (e) => e.stopPropagation());
+        }
+
+        /* ── Tutup saat klik di luar — pakai listener per instance ── */
+        document.addEventListener('mousedown', this._outsideClickHandler = (e) => {
+            if (!this.colorDropdown.classList.contains('is-open')) return;
+            if (this.colorDropdown.contains(e.target)) return;
+            if (this.colorBtn.contains(e.target)) return;
+            this._closeDropdown();
+        });
+    }
+
+    _saveSelection() {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+            this._savedRange = sel.getRangeAt(0).cloneRange();
+        }
+    }
+
+    _restoreSelection() {
+        if (!this._savedRange) return;
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(this._savedRange);
+        this.editor.focus();
+    }
+
+    _applyColor(color) {
+        this._restoreSelection();
+        document.execCommand('foreColor', false, color);
+        this._activeColor = color;
+        if (this.colorInd) this.colorInd.style.background = color;
+        this._sync();
+    }
+
+    _toggleDropdown() {
+        if (this.colorDropdown.classList.contains('is-open')) {
+            this._closeDropdown();
+        } else {
+            this._openDropdown();
+        }
+    }
+
+    _openDropdown() {
+        // Tutup semua dropdown lain
+        document.querySelectorAll('.rte-color-dropdown.is-open').forEach(dd => {
+            if (dd !== this.colorDropdown) dd.classList.remove('is-open');
+        });
+
+        // Hitung posisi tombol lalu posisikan dropdown secara fixed
+        const btnRect = this.colorBtn.getBoundingClientRect();
+        this.colorDropdown.style.top  = (btnRect.bottom + 8) + 'px';
+        this.colorDropdown.style.left = btnRect.left + 'px';
+
+        // Cegah dropdown keluar dari kanan layar
+        this.colorDropdown.classList.add('is-open');
+
+        // Koreksi jika keluar dari kanan layar
+        requestAnimationFrame(() => {
+            const ddRect     = this.colorDropdown.getBoundingClientRect();
+            const overflowRight = ddRect.right - window.innerWidth + 12;
+            if (overflowRight > 0) {
+                this.colorDropdown.style.left = (btnRect.left - overflowRight) + 'px';
+            }
+            // Koreksi jika keluar dari bawah layar
+            const overflowBottom = ddRect.bottom - window.innerHeight + 12;
+            if (overflowBottom > 0) {
+                this.colorDropdown.style.top = (btnRect.top - ddRect.height - 8) + 'px';
+            }
+        });
+    }
+
+    _closeDropdown() {
+        this.colorDropdown.classList.remove('is-open');
+    }
+
+    /* ════════════════════════════════════════════
+    FONT SIZE
+    ════════════════════════════════════════════ */
+    _initFontSize() {
+        const s = this.suffix;
+        const select = document.getElementById(`rte-size-${s}`);
+        if (!select) return;
+
+        // Saat user memilih ukuran
+        select.addEventListener('mousedown', (e) => {
+            // Simpan seleksi sebelum dropdown select terbuka
+            this._saveSelection();
+        });
+
+        select.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (!val) return;
+
+            // Restore seleksi lalu apply font size
+            this._restoreSelection();
+            document.execCommand('fontSize', false, val);
+
+            // Reset select ke placeholder agar bisa dipilih ulang
+            select.value = '';
+            this._sync();
+        });
+
+        // Cegah select menutup dropdown warna yang sedang terbuka
+        select.addEventListener('focus', () => {
+            this._saveSelection();
+        });
+    }
+
+    destroy() {
+        if (this._outsideClickHandler) {
+            document.removeEventListener('mousedown', this._outsideClickHandler);
+        }
+    }
+}
+
+/* ════════════════════════════════════════════
+   INISIALISASI & SINKRONISASI DENGAN LIVEWIRE
+════════════════════════════════════════════ */
+
+let rteTitle   = null;
+let rteContent = null;
+
+function initRteEditors(titleHtml = '', contentHtml = '') {
+    // Destroy instance lama agar tidak ada listener ganda
+    if (rteTitle)   rteTitle.destroy();
+    if (rteContent) rteContent.destroy();
+
+    setTimeout(() => {
+        rteTitle   = new RteEditor('rte-title',   'rte-title-sync');
+        rteContent = new RteEditor('rte-content', 'rte-content-sync');
+
+        if (rteTitle)   rteTitle.setContent(titleHtml);
+        if (rteContent) rteContent.setContent(contentHtml);
+    }, 80);
 }
 
 document.addEventListener('livewire:init', () => {
 
-    Livewire.on('note-deleted', (event) => {
+    Livewire.on('modal-opened', () => {
+        initRteEditors('', '');
+    });
 
+    Livewire.on('modal-edit', (event) => {
+        initRteEditors(event.title || '', event.content || '');
+    });
+
+    Livewire.on('note-saved', (event) => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Note Saved',
+            text: event.message,
+            background: '#FFFFFF',
+            color: '#2B2B2B',
+            confirmButtonColor: '#C87A45',
+            showConfirmButton: false,
+            timer: 2200,
+            timerProgressBar: true,
+            customClass: { popup: 'rounded-3xl' }
+        });
+    });
+
+    Livewire.on('note-deleted', (event) => {
         Swal.fire({
             toast: true,
             position: 'top-end',
@@ -1377,40 +2320,45 @@ document.addEventListener('livewire:init', () => {
             showConfirmButton: false,
             timer: 2500,
             timerProgressBar: true,
-
             background: '#FFFFFF',
             color: '#2B2B2B'
         });
-
     });
 
-});
-
-document.addEventListener('livewire:init', () => {
-
     Livewire.on('note-archived', (event) => {
-
         Swal.fire({
             toast: true,
             position: 'top-end',
-
             icon: 'success',
             title: 'Note archived successfully.',
-
             showConfirmButton: false,
             timer: 2500,
             timerProgressBar: true,
-
             background: '#FFFFFF',
             color: '#2B2B2B',
-
-            customClass: {
-                popup: 'rounded-3xl'
-            }
-        });              
-
+            customClass: { popup: 'rounded-3xl' }
+        });
     });
 
 });
+
+function confirmDelete(noteId) {
+    Swal.fire({
+        title: 'Delete Note?',
+        text: 'Are you sure you want to delete this note?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#C87A45',
+        cancelButtonColor: '#D1D5DB',
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel',
+        background: '#FFFFFF',
+        color: '#2B2B2B'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Livewire.dispatch('delete-note', { id: noteId });
+        }
+    });
+}
 </script>
 

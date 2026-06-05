@@ -26,18 +26,52 @@
 
     <div class="bg-white border border-[#EAE4DB] rounded-3xl p-10">
 
-        <h1 class="text-4xl font-bold text-[#2B2B2B] mb-6">
-            {{ $note->title }}
-        </h1>
+    <h1 class="text-4xl font-bold text-[#2B2B2B] mb-6">
+        {!! $note->title !!}
+    </h1>
 
         <div class="border-t border-[#EAE4DB] pt-6">
-            <p class="text-[#6B6B6B] leading-8 whitespace-pre-line">
-                {{ $note->content }}
-            </p>
+            <div class="text-[#6B6B6B] leading-8 note-content-render">
+                {!! $note->content !!}
+            </div>
         </div>
 
     </div>
 
 </div>
+
+<style>
+.note-content-render {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #6B6B6B;
+    word-break: break-word;
+}
+.note-content-render strong,
+.note-content-render b {
+    font-weight: 700;
+    color: #2B2B2B;
+}
+.note-content-render em,
+.note-content-render i {
+    font-style: italic;
+}
+.note-content-render u {
+    text-decoration: underline;
+}
+/* Pastikan warna inline dari span/font tetap dirender */
+.note-content-render span[style],
+.note-content-render font[color] {
+    /* Biarkan browser render inline style dari editor */
+}
+/* Jaga jarak antar paragraf jika ada tag <p> dari editor */
+.note-content-render p {
+    margin-bottom: 0.75em;
+}
+.note-content-render p:last-child {
+    margin-bottom: 0;
+}
+</style>
 
 @endsection
